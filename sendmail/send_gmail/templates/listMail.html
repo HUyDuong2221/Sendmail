@@ -11,6 +11,8 @@
          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     </head>
     <body>
+        {% extends 'menu.html' %}
+        {% block conten %}
         <form>
             <div class="card">
                 <a class="btn btn-primary" style="width: 150px" href="{% url 'send_mail' %}" type="button">Gửi Mail</a>
@@ -42,5 +44,6 @@
                 </div>
             </div>
         </form>
+        {% endblock conten%}
     </body>
 </html>

@@ -1,12 +1,13 @@
 from turtle import title
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
 #message
 from django.contrib import messages
-from flask import url_for
+
 # send mail
-from .models import send_mail as mailmodel , read_mail
-from .forms import SendMailForm
+from .models import send_mail as mailmodel , read_mail, customer
+from .forms import SendMailForm, CustomerForm
 import email
 import random
 from django.conf import settings
@@ -14,14 +15,60 @@ from django.core.mail import send_mail
 # nhận mail
 import imaplib
 import re
+#search
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
+#firebase
+
+
 
 # Create your views here.
+#firebase
+
+
+# tìm kiếm customer
+@csrf_exempt
+def search_customer(request):
+    if request.method == 'POST':
+        search_str = json.loads(request.body).get('searchText')
+        mail = customer.objects.filter(
+            email__istartswith = search_str) | customer.objects.filter(
+            name__icontains = search_str) | customer.objects.filter(phone__icontains = search_str)
+        
+        data = mail.values()
+        return JsonResponse(list(data), safe = False)
+
+
+@login_required(login_url='login')
+def add_customer(request):
+    ds = customer.objects.all()
+    form = CustomerForm()
+    if request.method == 'POST':
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request,'Thêm mới thành công')
+    return render(request, 'cus.html',{'form': form, 'ds': ds})
+
+@login_required(login_url='login')
+def edit_customer(request):
+    
+    return HttpResponse('aa')
+
+@login_required(login_url='login')
+def delete_customer(request):
+    
+    return HttpResponse('aa')
+
 
 #Gửi Mail
+@login_required(login_url='login')
 def ds_mail(request):
     ds = mailmodel.objects.all()
     return render(request, 'listMail.html',{'ds':ds})
 
+@login_required(login_url='login')
 def send_gmail(request):
     if request.method == 'POST':
         form = SendMailForm(request.POST)
@@ -46,17 +93,18 @@ def send_gmail(request):
         else:
             messages.success(request,'Gửi mail thất bại (nhập sai)')
     else: 
-        form = SendMailForm()
+        form = SendMailForm() 
         
     return render(request, 'send.html', {'form': form })
 
 #Nhận Mail
+@login_required(login_url='login')
 def ds_mail_nhan(request):
     dsn = read_mail.objects.all()
     return render(request, 'nhan.html',{'dsn':dsn})
 
+@login_required(login_url='login')
 def nhan_mail(request):
-    dsn = read_mail.objects.all()
     username ="huyduong111.dn@gmail.com"
     app_password= "vfdxrsbrkbznlgma"
     gmail_host= 'imap.gmail.com'
@@ -64,49 +112,54 @@ def nhan_mail(request):
     mail.login(username, app_password)
     mail.select("INBOX")
     
-    _, selected_mails = mail.search(None, 'UNSEEN')
+    _, selected_mails = mail.search(None, 'ALL')
     a = len(selected_mails[0].split())
-    if a >0 :
-        for num in selected_mails[0].split():
-            _, data = mail.fetch(num , '(RFC822)')
-            _, bytes_data = data[0]
-            email_message = email.message_from_bytes(bytes_data)
-            
-            #Lấy thông tin người gửi
-            sub = email_message['subject']
-            fro = email_message['from']
-            to = email_message['to']
-            date = email_message['date']
-            
-            #lấy Tin nhắn
-            for part in email_message.walk():
-                if part.get_content_type()=="text/plain" or part.get_content_type()=="text/html":
-                    message = part.get_payload(decode=True)
-                    mess = message.decode()
-            stt = mess.find('</div>')
-            mess1 = mess[15:stt]
-            mess2 = mess1.strip('<br>')  
-            sub1= sub[3:]  
-       
-            save_mail = read_mail.objects.create(Subject = sub1, To = to, send_date= date, From = fro, Message=mess2)     
-            save_mail.save()            
-        messages.success(request,'đã cập nhật thư mới')
-        return redirect('ds_mail_n')
-                #else:
-                    #messages.success(request,'Không có thư phản hồi')
-                    #return render(request, 'nhan.html',{'dsn': dsn})         
-    elif a ==0:
-        #return HttpResponse('Không có thư mới')
+    if a ==0:
         messages.success(request,'Không có thư mới')
         return redirect('ds_mail_n')
-             
+    
         
+    for num in selected_mails[0].split():
+        _, data = mail.fetch(num , '(RFC822)')
+        _, bytes_data = data[0]
+        email_message = email.message_from_bytes(bytes_data)
+            
+            #Lấy thông tin người gửi
+        sub = email_message['subject']
+        fro = email_message['from']
+        to = email_message['to']
+        date = email_message['date']
+            
+            #lấy Tin nhắn
+        for part in email_message.walk():
+            if part.get_content_type()=="text/plain" or part.get_content_type()=="text/html":
+                message = part.get_payload(decode=True)
+                mess = message.decode()
+        stt = mess.find('</div>')
+        mess1 = mess[15:stt]
+        mess2 = mess1.strip('<br>'+ '<div>')  
+        sub1= sub[4:]  
+        print(sub1)
+        list_title = list(mailmodel.objects.values_list('title'))
+        print(list_title)
+        if sub1 != '':
+            for i in list_title:
+                
+                b = str(sub1) in str(i) 
+                print(b)
+                if b is True:
+                    save_mail = read_mail.objects.create(Subject = sub1, To = to, send_date= date, From = fro, Message=mess2)     
+                    save_mail.save() 
+    messages.success(request,'đã cập nhật thư mới')
+    return redirect('ds_mail_n')   
+    #messages.success(request,'đã cập nhật thư mới')
+    #return redirect('ds_mail_n')
                 #else:
-                    #return HttpResponse('Không có thư phản hồi')
-            
+                    #messages.success(request,'Không có thư phản hồi')
+                    #return render(request, 'nhan.html',{'dsn': dsn})      
+
+
+    
+       
      
-                    
-                    
-            
-                    
             

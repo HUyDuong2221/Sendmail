@@ -16,12 +16,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from send_gmail import views
+from login_user import views as view_login
+from notification import views as noti_view
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    #email
     path('', views.ds_mail, name='ds_mail' ),
     path('sendmail/', views.send_gmail, name='send_mail' ),
     
     path('mail/', views.ds_mail_nhan, name='ds_mail_n'),
     path('mail/xem', views.nhan_mail, name='d'),
+    
+    path('search_customer', views.search_customer, name='search' ),
+    path('add/', views.add_customer, name='add_customer' ),
+    path('edit/', views.edit_customer, name='edit_customer' ),
+    #Login
+    path('login/', view_login.login_user, name='login'),
+    path('register/', view_login.register, name='register'),
+    path('logout/', view_login.logoutUser, name='logout' ),
+    #nothipication
+    path('index/', noti_view.main, name='index' ),
+    path('index2/', noti_view.showFirebaseJS, name='' ),
+    
 ]

@@ -1,3 +1,4 @@
+import email
 from django.db import models
 from tkinter import CASCADE
 from tkinter.messagebox import QUESTION
@@ -19,3 +20,9 @@ class read_mail(models.Model):
     send_date = models.CharField(max_length=100)
     From = models.CharField(max_length=100)
     Message = models.CharField(max_length=2000)
+    
+class customer(models.Model):
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=50)
+    email = models.EmailField()
+    

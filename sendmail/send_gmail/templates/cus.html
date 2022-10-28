@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        {% extends 'menu.html' %}
+      {% block conten %}
+      <form method="POST">
+        {% csrf_token %}
+        <h2> Thêm mới người dùng</h2>
+        <div class="row">
+        <div class="col-md-6" style="margin-left: 50px">
+            {{form}}
+            <input style="margin: 5px; margin-left: 650px " type="submit" value="Thêm" class="btn btn-primary">
+        </div>  
+        <div class="col-md-6"></div>  
+        </div
+        
+        
+     </form>
+     <hr/>
+        <div class="#">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody class="#">
+                {% for ds in ds %}
+                <tr>
+                    <th>{{ds.is}}</th>
+                    <th>{{ds.name}}</th>
+                    <th>{{ds.email}}</th>
+                    <th>{{ds.phone}}</th>
+                    <th>
+                        <a href="#">Edit</a>
+                        <a href="#">Delete</a>
+                    </th>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endblock conten %}
+    </body>
+</html>

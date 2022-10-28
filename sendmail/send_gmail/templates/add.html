@@ -1,0 +1,12 @@
+{% extends 'menu.html' %}
+      {% block conten %}
+      <div class="container">
+        <form method="POST">
+            {% csrf_token %}
+            <h2> Thêm mới người dùng</h2>
+
+            {{form}}
+            <input type="submit" value="Thêm">
+         </form>
+    </div>
+      {% endblock conten %}

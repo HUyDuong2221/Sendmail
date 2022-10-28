@@ -11,15 +11,46 @@
          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     </head>
     <body>
+      {% extends 'menu.html' %}
+      {% block conten %}
+      {% load static %}
         <div class="container">
           <a class="btn btn-primary" href="{% url 'ds_mail' %}" type="button">Danh sách Mail đã gửi</a>
             <form action="" id="form" method="POST">
+              <div class = "row">
+                <div class="col-md-8"></div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <input type="text" name="" id="searchField" style="margin-bottom: 2px" class="form-control" placeholder="Search">
+                    <div class="table_output">
+                      <table class="table table-hover">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody class="table-body">
+
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="app-table"> </div>
+              
+                    <div class="table-container"></div> 
+                </div>
+              </div>
+              
+
               <div class="row">
             {% csrf_token %}
             <div class="col-md-4">
               <div class="form-group">
                 <label for="input-help-text">Email Người Nhận:</label>
-                <input type="text" class="form-control" id="input-help-text" name="email">
+                <input type="text" class="form-control" id="email" name="email" >
               </div>
             
             <div class="form-group">
@@ -29,7 +60,7 @@
             
             <div class="form-group">
                 <label for="input-help-text">Tên Người Nhận:</label>
-                <input type="text" class="form-control" id="input-help-text" name="name">
+                <input type="text" class="form-control" id="customer-name" name="name">
             </div>
             
             <div class="form-group">
@@ -68,5 +99,9 @@
           </form>
           
         </div>
+
+        <script src="{% static 'js/search.js' %} "> </script>
+
+        {% endblock conten %}
     </body>
 </html>

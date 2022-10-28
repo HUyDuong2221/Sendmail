@@ -1,0 +1,7 @@
+{% extends 'menu.html' %}
+    {% block conten %}
+    <form method="POST">
+        {% csrf_token %}
+        {{form}}
+    </form>
+    {% endblock conten%}

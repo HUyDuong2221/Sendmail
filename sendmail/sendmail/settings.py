@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'send_gmail',
+    'login_user',
+    'notification',
 ]
 
 MIDDLEWARE = [
